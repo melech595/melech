@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Cargar pedido</title>
+<style>
+  :root {
+    --bg: #f5f4f0; --card: #fff; --text: #1a1a18; --muted: #6b6b66;
+    --border: #e2e0da; --accent: #1a3f6b; --accent-light: #e8f0f5;
+    --green: #1a6b4a; --green-light: #e8f5ee; --danger: #c0392b;
+    --radius: 12px; --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 48px; }
+  header { background: var(--accent); color: #fff; padding: 18px 20px 14px; }
+  header h1 { font-size: 18px; font-weight: 700; }
+  header p { font-size: 12px; opacity: 0.75; margin-top: 2px; }
+  .body { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+  .card { background: var(--card); border-radius: var(--radius); padding: 16px; border: 1px solid var(--border); }
+  .card-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 12px; }
+  label { display: block; font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 5px; margin-top: 12px; }
+  label:first-of-type { margin-top: 0; }
+  select, input[type="text"], input[type="number"] {
+    width: 100%; padding: 12px 13px; border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); font-family: inherit; font-size: 16px;
+    color: var(--text); background: var(--bg); -webkit-appearance: none; outline: none;
+  }
+  select:focus, input:focus { border-color: var(--accent); background: #fff; }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b66' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center; padding-right: 38px;
+  }
+  .item-block { border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 10px; position: relative; background: var(--bg); }
+  .item-num { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .cod-row { display: flex; align-items: stretch; margin-bottom: 8px; }
+  .cod-prefix { background: var(--accent-light); color: var(--accent); font-size: 13px; font-weight: 700; padding: 0 10px; border: 1.5px solid var(--border); border-right: none; border-radius: var(--radius-sm) 0 0 var(--radius-sm); display: flex; align-items: center; white-space: nowrap; }
+  .cod-input { flex: 1; border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important; }
+  .desc-bul-row { display: grid; grid-template-columns: 1fr 72px; gap: 8px; }
+  .bul-input { text-align: center; font-size: 16px; font-weight: 700; color: var(--accent); }
+  .remove-btn { position: absolute; top: 8px; right: 8px; background: none; border: none; color: var(--danger); font-size: 20px; cursor: pointer; padding: 2px 6px; opacity: 0.55; }
+  .add-btn { width: 100%; padding: 11px; border: 1.5px dashed var(--border); border-radius: var(--radius-sm); background: transparent; color: var(--muted); font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .add-btn:active { border-color: var(--accent); color: var(--accent); }
+  .error-card { display: none; background: #fdf0ef; border: 1px solid #e8c5c2; border-radius: var(--radius-sm); padding: 12px 14px; font-size: 13px; color: var(--danger); font-weight: 500; }
+  .error-card.show { display: block; }
+  .gen-btn { width: 100%; padding: 15px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font-family: inherit; font-size: 17px; font-weight: 700; cursor: pointer; }
+  .gen-btn:active { opacity: 0.85; }
+  .result-card { display: none; background: var(--card); border-radius: var(--radius); border: 2px solid var(--green); overflow: hidden; }
+  .result-card.show { display: block; }
+  .result-top { background: var(--green-light); padding: 12px 16px; }
+  .result-cliente { font-size: 15px; font-weight: 700; color: var(--green); }
+  .result-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: #f0f0ec; }
+  thead th { padding: 8px 12px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); border-bottom: 1px solid var(--border); }
+  thead th.r { text-align: center; }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody td { padding: 10px 12px; vertical-align: middle; }
+  .td-cod { font-size: 11px; font-weight: 700; color: var(--accent); font-family: monospace; white-space: nowrap; }
+  .td-desc { font-size: 13px; font-weight: 600; color: var(--text); }
+  .td-bul { text-align: center; font-size: 17px; font-weight: 700; color: var(--green); }
+  .total-row { background: var(--green); }
+  .total-row td { padding: 12px 16px; color: #fff; font-weight: 700; font-size: 14px; }
+  .total-num { text-align: center; font-size: 22px; font-weight: 700; }
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--border); }
+  .share-btn { padding: 14px; background: #25D366; color: #fff; border: none; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; border-right: 1px solid rgba(255,255,255,0.2); }
+  .new-btn { padding: 14px; background: var(--accent); color: #fff; border: none; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
+  .foto-zone { border: 2px dashed var(--border); border-radius: var(--radius-sm); text-align: center; cursor: pointer; position: relative; overflow: hidden; }
+  .foto-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  #foto-placeholder { padding: 24px 16px; }
+  .foto-icon { width: 44px; height: 44px; margin: 0 auto 10px; background: var(--accent-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .foto-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .foto-sub { font-size: 13px; color: var(--muted); }
+  .foto-preview { display: none; width: 100%; max-height: 220px; object-fit: contain; }
+  .foto-preview.show { display: block; }
+  .foto-change { display: none; font-size: 12px; color: var(--accent); font-weight: 600; padding: 7px; background: var(--accent-light); text-align: center; }
+  .foto-change.show { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Cargar pedido</h1>
+  <p>Mirá la foto del cliente y completá los datos</p>
+</header>
+<div class="body">
+
+  <div class="card">
+    <div class="card-title">Datos</div>
+    <label>Vendedor</label>
+    <select id="vendedor">
+      <option value="">Seleccioná...</option>
+      <option>Martín</option>
+      <option>Ari</option>
+      <option>Gise</option>
+    </select>
+    <label>Cliente</label>
+    <input type="text" id="cliente" placeholder="Nombre del cliente" autocomplete="off" autocorrect="off">
+  </div>
+
+  <div class="card">
+    <div class="card-title">Artículos</div>
+    <div id="items-container"></div>
+    <button class="add-btn" onclick="agregarItem()">+ Agregar artículo</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Foto del cliente (opcional)</div>
+    <div class="foto-zone" id="foto-zone">
+      <input type="file" id="foto-input" accept="image/*" onchange="fotoSeleccionada(this)">
+      <div id="foto-placeholder">
+        <div class="foto-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1a3f6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </div>
+        <div class="foto-title">Adjuntar foto del pedido</div>
+        <div class="foto-sub">Tocá para elegir o sacar foto</div>
+      </div>
+      <img id="foto-preview" class="foto-preview" alt="Foto del pedido">
+      <div id="foto-change" class="foto-change">Tocá para cambiar la foto</div>
+    </div>
+  </div>
+
+  <div class="error-card" id="error">Completá el vendedor, el cliente y al menos un artículo con bultos.</div>
+
+  <button class="gen-btn" onclick="generar()">Generar pedido</button>
+
+  <div class="result-card" id="result-card">
+    <div class="result-top">
+      <div class="result-cliente" id="res-cliente"></div>
+      <div class="result-meta" id="res-meta"></div>
+    </div>
+    <table>
+      <thead><tr><th>Código</th><th>Descripción</th><th class="r">Bultos</th></tr></thead>
+      <tbody id="res-body"></tbody>
+      <tfoot>
+        <tr class="total-row">
+          <td colspan="2">Total bultos</td>
+          <td class="total-num" id="res-total">0</td>
+        </tr>
+      </tfoot>
+    </table>
+    <div class="btn-row">
+      <button class="share-btn" onclick="compartir()">Compartir</button>
+      <button class="new-btn" onclick="nuevo()">Nuevo pedido</button>
+    </div>
+  </div>
+
+</div>
+<script>
+  var itemCount = 0;
+  var nroPedido = parseInt(localStorage.getItem('nroPedido') || '1');
+  var mensajeActual = '';
+
+  function agregarItem() {
+    itemCount++;
+    var id = itemCount;
+    var div = document.createElement('div');
+    div.className = 'item-block';
+    div.id = 'item-' + id;
+    div.innerHTML =
+      '<div class="item-num">Artículo ' + id + '</div>' +
+      (id > 1 ? '<button class="remove-btn" onclick="quitarItem(' + id + ')">×</button>' : '') +
+      '<div class="cod-row">' +
+        '<span class="cod-prefix">MELECH-</span>' +
+        '<input type="text" id="cod-' + id + '" class="cod-input" placeholder="180" inputmode="numeric" autocomplete="off" autocorrect="off" autocapitalize="off">' +
+      '</div>' +
+      '<div class="desc-bul-row">' +
+        '<input type="text" id="desc-' + id + '" placeholder="Descripción" autocomplete="off" autocorrect="off">' +
+        '<input type="number" id="bul-' + id + '" class="bul-input" placeholder="B" min="1">' +
+      '</div>';
+    document.getElementById('items-container').appendChild(div);
+  }
+
+  function quitarItem(id) {
+    var el = document.getElementById('item-' + id);
+    if (el) el.remove();
+  }
+
+  var fotoArchivo = null;
+
+  function fotoSeleccionada(input) {
+    if (!input.files || !input.files[0]) return;
+    fotoArchivo = input.files[0];
+    var url = URL.createObjectURL(fotoArchivo);
+    var prev = document.getElementById('foto-preview');
+    prev.src = url;
+    prev.classList.add('show');
+    document.getElementById('foto-placeholder').style.display = 'none';
+    document.getElementById('foto-change').classList.add('show');
+  }
+
+  function generar() {
+    var v = document.getElementById('vendedor').value;
+    var c = document.getElementById('cliente').value.trim();
+    var errEl = document.getElementById('error');
+    var bloques = document.querySelectorAll('.item-block');
+    var items = [];
+
+    bloques.forEach(function(b) {
+      var m = b.id.match(/item-(\d+)/);
+      if (!m) return;
+      var id = m[1];
+      var cod = (document.getElementById('cod-' + id)||{}).value||'';
+      var desc = (document.getElementById('desc-' + id)||{}).value||'';
+      var bul = parseInt((document.getElementById('bul-' + id)||{}).value)||0;
+      cod = cod.trim().toUpperCase();
+      desc = desc.trim();
+      if (cod && bul > 0) items.push({ codigo: 'MELECH-' + cod, descripcion: desc, bultos: bul });
+    });
+
+    if (!v || !c || items.length === 0) { errEl.classList.add('show'); return; }
+    errEl.classList.remove('show');
+
+    var fecha = new Date().toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' });
+    var hora = new Date().toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
+    var nro = nroPedido++;
+    localStorage.setItem('nroPedido', nroPedido);
+
+    document.getElementById('res-cliente').textContent = 'Cliente: ' + c;
+    document.getElementById('res-meta').textContent = 'Vendedor: ' + v + '  ·  Pedido #' + nro + '  ·  ' + fecha + ' ' + hora;
+
+    var tbody = document.getElementById('res-body');
+    tbody.innerHTML = '';
+    var total = 0;
+    var msg = 'PEDIDO #' + nro + '\n' + fecha + ' ' + hora + '\nVendedor: ' + v + '\nCliente: ' + c + '\n--------------------\n';
+
+    items.forEach(function(it) {
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td class="td-cod">[' + it.codigo + ']</td>' +
+        '<td class="td-desc">' + (it.descripcion || '—') + '</td>' +
+        '<td class="td-bul">' + it.bultos + '</td>';
+      tbody.appendChild(tr);
+      total += it.bultos;
+      msg += '[' + it.codigo + '] ' + (it.descripcion || '') + ': ' + it.bultos + ' bulto' + (it.bultos===1?'':'s') + '\n';
+    });
+
+    document.getElementById('res-total').textContent = total;
+    msg += '--------------------\nTOTAL: ' + total + ' bulto' + (total===1?'':'s');
+    mensajeActual = msg;
+
+    document.getElementById('result-card').classList.add('show');
+    document.getElementById('result-card').scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  function compartir() {
+    if (navigator.share && fotoArchivo) {
+      // Compartir texto + foto juntos
+      navigator.share({ text: mensajeActual, files: [fotoArchivo] }).catch(function() {
+        // Si falla con archivo, compartir solo texto
+        navigator.share({ text: mensajeActual });
+      });
+    } else if (navigator.share) {
+      navigator.share({ text: mensajeActual });
+    } else {
+      window.open('https://wa.me/?text=' + encodeURIComponent(mensajeActual), '_blank');
+    }
+  }
+
+  function nuevo() {
+    document.getElementById('vendedor').value = '';
+    document.getElementById('cliente').value = '';
+    document.getElementById('items-container').innerHTML = '';
+    document.getElementById('result-card').classList.remove('show');
+    document.getElementById('error').classList.remove('show');
+    itemCount = 0; mensajeActual = ''; fotoArchivo = null;
+    document.getElementById('foto-input').value = '';
+    var prev = document.getElementById('foto-preview');
+    prev.classList.remove('show'); prev.src = '';
+    document.getElementById('foto-placeholder').style.display = '';
+    document.getElementById('foto-change').classList.remove('show');
+    agregarItem(); agregarItem();
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+
+  agregarItem();
+  agregarItem();
+</script>
+</body>
+</html>
