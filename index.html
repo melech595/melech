@@ -31,60 +31,95 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b66' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat; background-position: right 14px center; padding-right: 38px;
   }
+
+  /* BUSCADOR */
+  .search-wrap { position: relative; }
+  .search-input { width: 100%; padding: 12px 13px 12px 40px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 15px; color: var(--text); background: var(--bg); outline: none; }
+  .search-input:focus { border-color: var(--accent); background: #fff; }
+  .search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+  .dropdown { display: none; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1.5px solid var(--accent); border-top: none; border-radius: 0 0 var(--radius-sm) var(--radius-sm); max-height: 240px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .dropdown.show { display: block; }
+  .drop-item { padding: 10px 13px; cursor: pointer; border-bottom: 1px solid var(--border); }
+  .drop-item:last-child { border-bottom: none; }
+  .drop-item:hover, .drop-item.active { background: var(--accent-light); }
+  .drop-cod { font-size: 11px; font-weight: 700; color: var(--accent); }
+  .drop-nombre { font-size: 13px; color: var(--text); margin-top: 1px; }
+  .drop-precio { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .drop-empty { padding: 12px 13px; font-size: 13px; color: var(--muted); text-align: center; }
+
+  /* ARTÍCULOS */
   .item-block { border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 10px; position: relative; background: var(--bg); }
-  .item-num { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
-  .cod-row { display: flex; align-items: stretch; margin-bottom: 8px; }
-  .cod-prefix { background: var(--accent-light); color: var(--accent); font-size: 13px; font-weight: 700; padding: 0 10px; border: 1.5px solid var(--border); border-right: none; border-radius: var(--radius-sm) 0 0 var(--radius-sm); display: flex; align-items: center; white-space: nowrap; }
-  .cod-input { flex: 1; border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important; }
-  .desc-bul-row { display: grid; grid-template-columns: 1fr 72px; gap: 8px; }
-  .bul-input { text-align: center; font-size: 16px; font-weight: 700; color: var(--accent); }
+  .item-block.tiene-producto { border-color: var(--accent); background: var(--accent-light); }
+  .item-num { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .item-info { background: #fff; border-radius: var(--radius-sm); padding: 8px 10px; margin-bottom: 8px; display: none; }
+  .item-info.show { display: block; }
+  .item-info-cod { font-size: 11px; font-weight: 700; color: var(--accent); }
+  .item-info-nombre { font-size: 13px; font-weight: 600; color: var(--text); margin-top: 2px; line-height: 1.3; }
+  .item-info-precio { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .item-info-upb { font-size: 12px; color: var(--green); font-weight: 600; margin-top: 2px; }
+  .item-info-stock-alert { font-size: 12px; font-weight: 700; color: #c0392b; background: #fdf0ef; border: 1px solid #e8c5c2; border-radius: 6px; padding: 5px 8px; margin-top: 6px; }
+  .modo-toggle { display: flex; gap: 6px; }
+  .modo-btn { flex: 1; padding: 8px 6px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--muted); font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .modo-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .item-info-stock-ok { font-size: 12px; color: var(--green); margin-top: 4px; }
+
+  .bul-uni-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .bul-uni-box { background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; text-align: center; }
+  .bul-uni-box.editable { border-color: var(--accent); }
+  .bul-uni-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 4px; }
+  .bul-uni-input { width: 100%; border: none; text-align: center; font-size: 22px; font-weight: 700; color: var(--accent); font-family: inherit; background: transparent; outline: none; padding: 0; }
+  .bul-uni-value { font-size: 22px; font-weight: 700; color: var(--green); }
+  .bul-uni-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
   .remove-btn { position: absolute; top: 8px; right: 8px; background: none; border: none; color: var(--danger); font-size: 20px; cursor: pointer; padding: 2px 6px; opacity: 0.55; }
   .add-btn { width: 100%; padding: 11px; border: 1.5px dashed var(--border); border-radius: var(--radius-sm); background: transparent; color: var(--muted); font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
   .add-btn:active { border-color: var(--accent); color: var(--accent); }
+
+  .foto-zone { border: 2px dashed var(--border); border-radius: var(--radius-sm); text-align: center; cursor: pointer; position: relative; overflow: hidden; }
+  .foto-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .foto-placeholder { padding: 20px 16px; }
+  .foto-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .foto-sub { font-size: 12px; color: var(--muted); }
+  .foto-preview { display: none; width: 100%; max-height: 200px; object-fit: contain; }
+  .foto-preview.show { display: block; }
+  .foto-change { display: none; font-size: 12px; color: var(--accent); font-weight: 600; padding: 6px; background: var(--accent-light); text-align: center; }
+  .foto-change.show { display: block; }
+
   .error-card { display: none; background: #fdf0ef; border: 1px solid #e8c5c2; border-radius: var(--radius-sm); padding: 12px 14px; font-size: 13px; color: var(--danger); font-weight: 500; }
   .error-card.show { display: block; }
   .gen-btn { width: 100%; padding: 15px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font-family: inherit; font-size: 17px; font-weight: 700; cursor: pointer; }
   .gen-btn:active { opacity: 0.85; }
+
   .result-card { display: none; background: var(--card); border-radius: var(--radius); border: 2px solid var(--green); overflow: hidden; }
   .result-card.show { display: block; }
   .result-top { background: var(--green-light); padding: 12px 16px; }
   .result-cliente { font-size: 15px; font-weight: 700; color: var(--green); }
   .result-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
-  table { width: 100%; border-collapse: collapse; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
   thead tr { background: #f0f0ec; }
-  thead th { padding: 8px 12px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); border-bottom: 1px solid var(--border); }
-  thead th.r { text-align: center; }
+  thead th { padding: 7px 10px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); border-bottom: 1px solid var(--border); }
+  thead th.r { text-align: right; }
   tbody tr { border-bottom: 1px solid var(--border); }
   tbody tr:last-child { border-bottom: none; }
-  tbody td { padding: 10px 12px; vertical-align: middle; }
-  .td-cod { font-size: 11px; font-weight: 700; color: var(--accent); font-family: monospace; white-space: nowrap; }
-  .td-desc { font-size: 13px; font-weight: 600; color: var(--text); }
-  .td-bul { text-align: center; font-size: 17px; font-weight: 700; color: var(--green); }
+  tbody td { padding: 8px 10px; vertical-align: middle; }
+  .td-cod { font-size: 10px; font-weight: 700; color: var(--accent); font-family: monospace; }
+  .td-nombre { font-size: 12px; font-weight: 600; color: var(--text); }
+  .td-sub { font-size: 10px; color: var(--muted); margin-top: 1px; }
+  .td-r { text-align: right; font-weight: 700; color: var(--green); }
   .total-row { background: var(--green); }
-  .total-row td { padding: 12px 16px; color: #fff; font-weight: 700; font-size: 14px; }
-  .total-num { text-align: center; font-size: 22px; font-weight: 700; }
+  .total-row td { padding: 10px 14px; color: #fff; font-weight: 700; font-size: 13px; }
+  .total-num { text-align: right; font-size: 18px; font-weight: 700; }
   .btn-row { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--border); }
   .share-btn { padding: 14px; background: #25D366; color: #fff; border: none; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; border-right: 1px solid rgba(255,255,255,0.2); }
   .new-btn { padding: 14px; background: var(--accent); color: #fff; border: none; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
-  .foto-zone { border: 2px dashed var(--border); border-radius: var(--radius-sm); text-align: center; cursor: pointer; position: relative; overflow: hidden; }
-  .foto-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-  #foto-placeholder { padding: 24px 16px; }
-  .foto-icon { width: 44px; height: 44px; margin: 0 auto 10px; background: var(--accent-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-  .foto-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
-  .foto-sub { font-size: 13px; color: var(--muted); }
-  .foto-preview { display: none; width: 100%; max-height: 220px; object-fit: contain; }
-  .foto-preview.show { display: block; }
-  .foto-change { display: none; font-size: 12px; color: var(--accent); font-weight: 600; padding: 7px; background: var(--accent-light); text-align: center; }
-  .foto-change.show { display: block; }
 </style>
 </head>
 <body>
 <header>
   <h1>Cargar pedido</h1>
-  <p>Mirá la foto del cliente y completá los datos</p>
+  <p>Buscá el producto y completá los bultos</p>
 </header>
 <div class="body">
-
   <div class="card">
     <div class="card-title">Datos</div>
     <label>Vendedor</label>
@@ -105,37 +140,34 @@
   </div>
 
   <div class="card">
-    <div class="card-title">Foto del cliente (opcional)</div>
+    <div class="card-title">Foto del pedido (opcional)</div>
     <div class="foto-zone" id="foto-zone">
-      <input type="file" id="foto-input" accept="image/*" onchange="fotoSeleccionada(this)">
-      <div id="foto-placeholder">
-        <div class="foto-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#1a3f6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        </div>
-        <div class="foto-title">Adjuntar foto del pedido</div>
+      <input type="file" id="foto-input" accept="image/*" onchange="fotoSel(this)">
+      <div class="foto-placeholder" id="foto-ph">
+        <div class="foto-title">Adjuntar foto</div>
         <div class="foto-sub">Tocá para elegir o sacar foto</div>
       </div>
-      <img id="foto-preview" class="foto-preview" alt="Foto del pedido">
-      <div id="foto-change" class="foto-change">Tocá para cambiar la foto</div>
+      <img id="foto-prev" class="foto-preview" alt="">
+      <div id="foto-ch" class="foto-change">Tocá para cambiar la foto</div>
     </div>
   </div>
 
-  <div class="error-card" id="error">Completá el vendedor, el cliente y al menos un artículo con bultos.</div>
-
+  <div class="error-card" id="error">Completá el vendedor, el cliente y al menos un artículo.</div>
   <button class="gen-btn" onclick="generar()">Generar pedido</button>
 
   <div class="result-card" id="result-card">
     <div class="result-top">
-      <div class="result-cliente" id="res-cliente"></div>
+      <div class="result-cliente" id="res-cli"></div>
       <div class="result-meta" id="res-meta"></div>
     </div>
     <table>
-      <thead><tr><th>Código</th><th>Descripción</th><th class="r">Bultos</th></tr></thead>
+      <thead><tr><th>Código</th><th>Descripción</th><th class="r">Bultos</th><th class="r">Unidades</th></tr></thead>
       <tbody id="res-body"></tbody>
       <tfoot>
         <tr class="total-row">
-          <td colspan="2">Total bultos</td>
-          <td class="total-num" id="res-total">0</td>
+          <td colspan="2">Total</td>
+          <td class="total-num" id="res-tot-bul">0</td>
+          <td class="total-num" id="res-tot-uni">0</td>
         </tr>
       </tfoot>
     </table>
@@ -144,137 +176,341 @@
       <button class="new-btn" onclick="nuevo()">Nuevo pedido</button>
     </div>
   </div>
-
 </div>
+
 <script>
-  var itemCount = 0;
-  var nroPedido = parseInt(localStorage.getItem('nroPedido') || '1');
-  var mensajeActual = '';
+var CATALOGO = [];
+var CATALOGO_CARGADO = false;
+function cargarCatalogo(callback) {
+  if (CATALOGO_CARGADO) { callback(); return; }
+  fetch('catalogo.json').then(function(r){ return r.json(); }).then(function(data){
+    CATALOGO = data; CATALOGO_CARGADO = true; callback();
+  }).catch(function(){ alert('No se pudo cargar el catálogo.'); });
+}
+var itemCount = 0;
+var nroPedido = parseInt(localStorage.getItem('nroPedido') || '1');
+var mensajeActual = '';
+var fotoArchivo = null;
+var itemData = {};
 
-  function agregarItem() {
-    itemCount++;
-    var id = itemCount;
+function buscar(query, id) {
+  var q = query.trim().toUpperCase();
+  if (q.length < 2) { cerrarDropdown(id); return; }
+  cargarCatalogo(function() {
+    var resultados = CATALOGO.filter(function(p) {
+      return p.cod.toUpperCase().includes(q) || p.nombre.toUpperCase().includes(q);
+    }).slice(0, 30);
+    mostrarDropdown(id, resultados);
+  });
+}
+
+function mostrarDropdown(id, items) {
+  var dd = document.getElementById('dd-' + id);
+  dd.innerHTML = '';
+  if (items.length === 0) {
+    dd.innerHTML = '<div class="drop-empty">Sin resultados</div>';
+    dd.classList.add('show');
+    return;
+  }
+  items.forEach(function(p) {
     var div = document.createElement('div');
-    div.className = 'item-block';
-    div.id = 'item-' + id;
-    div.innerHTML =
-      '<div class="item-num">Artículo ' + id + '</div>' +
-      (id > 1 ? '<button class="remove-btn" onclick="quitarItem(' + id + ')">×</button>' : '') +
-      '<div class="cod-row">' +
-        '<span class="cod-prefix">MELECH-</span>' +
-        '<input type="text" id="cod-' + id + '" class="cod-input" placeholder="180" inputmode="numeric" autocomplete="off" autocorrect="off" autocapitalize="off">' +
+    div.className = 'drop-item';
+    var precioStr = p.precio > 0 ? (p.moneda + ' ' + p.precio.toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2})) : 'Sin precio';
+    var upbStr = p.upb ? ' · ' + p.upb + ' u/bulto' : '';
+    var stockStr = p.stock > 0 ? ' · Stock: ' + p.stock : (p.stock === 0 ? ' · Sin stock' : '');
+    div.innerHTML = '<div class="drop-cod">[' + p.cod + ']</div>' +
+      '<div class="drop-nombre">' + p.nombre + '</div>' +
+      '<div class="drop-precio">' + precioStr + upbStr + stockStr + '</div>';
+    div.onclick = function() { seleccionarProducto(id, p); };
+    dd.appendChild(div);
+  });
+  dd.classList.add('show');
+}
+
+function cerrarDropdown(id) {
+  var dd = document.getElementById('dd-' + id);
+  if (dd) dd.classList.remove('show');
+}
+
+function seleccionarProducto(id, p) {
+  itemData[id] = p;
+  var inp = document.getElementById('search-' + id);
+  inp.value = '[' + p.cod + '] ' + p.nombre;
+  cerrarDropdown(id);
+
+  var infoDiv = document.getElementById('info-' + id);
+  var precioStr = p.precio > 0 ? p.moneda + ' ' + p.precio.toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2}) : 'Sin precio';
+  var upbStr = p.upb ? p.upb + ' unidades por bulto' : 'Sin info de unidades';
+  var sinStock = p.stock <= 0;
+  var stockStr = sinStock
+    ? '<div class="item-info-stock-alert">⚠️ Sin stock — avisale al cliente</div>'
+    : '<div class="item-info-stock-ok">✅ Stock disponible: ' + p.stock + ' u.</div>';
+  infoDiv.innerHTML =
+    '<div class="item-info-cod">[' + p.cod + ']</div>' +
+    '<div class="item-info-nombre">' + p.nombre + '</div>' +
+    '<div class="item-info-precio">Precio: ' + precioStr + '</div>' +
+    '<div class="item-info-upb">📦 ' + upbStr + '</div>' +
+    stockStr;
+  infoDiv.classList.add('show');
+
+  var blk = document.getElementById('item-' + id);
+  blk.classList.add('tiene-producto');
+
+  // Mostrar fila bultos/unidades
+  var buRow = document.getElementById('burow-' + id);
+  buRow.style.display = 'grid';
+
+  // Si tiene UPB, calcular unidades al poner bultos
+  recalcUnidades(id);
+}
+
+var itemModo = {}; // 'bultos' o 'unidades'
+
+function setModo(id, modo) {
+  itemModo[id] = modo;
+  var btnBul = document.getElementById('modo-bul-' + id);
+  var btnUni = document.getElementById('modo-uni-' + id);
+  var label = document.getElementById('bul-label-' + id);
+  var sub = document.getElementById('bul-sub-' + id);
+  var uniBox = document.getElementById('uni-box-' + id);
+  var input = document.getElementById('bul-' + id);
+  input.value = '';
+
+  if (modo === 'bultos') {
+    btnBul.classList.add('active'); btnUni.classList.remove('active');
+    label.textContent = 'Bultos';
+    sub.textContent = 'cantidad';
+    uniBox.style.display = '';
+  } else {
+    btnUni.classList.add('active'); btnBul.classList.remove('active');
+    label.textContent = 'Unidades';
+    sub.textContent = 'sueltas';
+    uniBox.style.display = 'none';
+  }
+  recalcUnidades(id);
+}
+
+function recalcUnidades(id) {
+  var p = itemData[id];
+  if (!p) return;
+  var modo = itemModo[id] || 'bultos';
+  var val = parseInt(document.getElementById('bul-' + id).value) || 0;
+  var uniDiv = document.getElementById('uni-' + id);
+
+  if (modo === 'unidades') {
+    // En modo unidades, el valor ingresado ES la cantidad de unidades
+    if (val > 0) uniDiv.textContent = val.toLocaleString('es-AR');
+    else uniDiv.textContent = '0';
+  } else {
+    // En modo bultos, calcular unidades automáticamente
+    if (p.upb && val > 0) uniDiv.textContent = (val * p.upb).toLocaleString('es-AR');
+    else if (val > 0) uniDiv.textContent = '—';
+    else uniDiv.textContent = '0';
+  }
+
+  // Validar que no supere el stock
+  validarStock(id);
+}
+
+function validarStock(id) {
+  var p = itemData[id];
+  if (!p || p.stock <= 0) return; // sin stock ya tiene alerta propia
+  var modo = itemModo[id] || 'bultos';
+  var val = parseInt(document.getElementById('bul-' + id).value) || 0;
+  var unidades = modo === 'unidades' ? val : (p.upb ? val * p.upb : val);
+  var alertDiv = document.getElementById('stock-alert-' + id);
+  if (!alertDiv) return;
+  if (unidades > p.stock && unidades > 0) {
+    alertDiv.textContent = '⛔ Superás el stock disponible (' + p.stock + ' u.). Reducí la cantidad.';
+    alertDiv.style.display = 'block';
+    document.getElementById('bul-' + id).style.borderColor = '#c0392b';
+  } else {
+    alertDiv.style.display = 'none';
+    document.getElementById('bul-' + id).style.borderColor = '';
+  }
+}
+
+function agregarItem() {
+  itemCount++;
+  var id = itemCount;
+  var div = document.createElement('div');
+  div.className = 'item-block';
+  div.id = 'item-' + id;
+  div.innerHTML =
+    '<div class="item-num">Artículo ' + id + '</div>' +
+    (id > 1 ? '<button class="remove-btn" onclick="quitarItem(' + id + ')">×</button>' : '') +
+    '<div class="search-wrap">' +
+      '<span class="search-icon">🔍</span>' +
+      '<input type="text" id="search-' + id + '" class="search-input" placeholder="Buscá por código o nombre..." autocomplete="off" autocorrect="off" autocapitalize="off"' +
+        ' oninput="buscar(this.value,' + id + ')" onblur="setTimeout(function(){cerrarDropdown(' + id + ')},200)">' +
+      '<div class="dropdown" id="dd-' + id + '"></div>' +
+    '</div>' +
+    '<div class="item-info" id="info-' + id + '"></div>' +
+    '<div style="margin-top:8px;">' +
+      '<div class="modo-toggle" id="modo-wrap-' + id + '">' +
+        '<button class="modo-btn active" id="modo-bul-' + id + '" onclick="setModo(' + id + ',\'bultos\')">Por bultos</button>' +
+        '<button class="modo-btn" id="modo-uni-' + id + '" onclick="setModo(' + id + ',\'unidades\')">Unidades sueltas</button>' +
       '</div>' +
-      '<div class="desc-bul-row">' +
-        '<input type="text" id="desc-' + id + '" placeholder="Descripción" autocomplete="off" autocorrect="off">' +
-        '<input type="number" id="bul-' + id + '" class="bul-input" placeholder="B" min="1">' +
-      '</div>';
-    document.getElementById('items-container').appendChild(div);
-  }
+      '<div class="bul-uni-row" id="burow-' + id + '" style="margin-top:8px;">' +
+        '<div class="bul-uni-box editable">' +
+          '<div class="bul-uni-label" id="bul-label-' + id + '">Bultos</div>' +
+          '<input type="number" id="bul-' + id + '" class="bul-uni-input" placeholder="0" min="1" oninput="recalcUnidades(' + id + ')">' +
+          '<div class="bul-uni-sub" id="bul-sub-' + id + '">cantidad</div>' +
+        '</div>' +
+        '<div class="bul-uni-box" id="uni-box-' + id + '">' +
+          '<div class="bul-uni-label">Unidades</div>' +
+          '<div class="bul-uni-value" id="uni-' + id + '">0</div>' +
+          '<div class="bul-uni-sub">automático</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div id="stock-alert-' + id + '" style="display:none; margin-top:6px; font-size:12px; font-weight:700; color:#c0392b; background:#fdf0ef; border:1px solid #e8c5c2; border-radius:6px; padding:6px 10px;"></div>';
+  document.getElementById('items-container').appendChild(div);
+  setTimeout(function(){ document.getElementById('search-' + id).focus(); }, 50);
+}
 
-  function quitarItem(id) {
-    var el = document.getElementById('item-' + id);
-    if (el) el.remove();
-  }
+function quitarItem(id) {
+  var el = document.getElementById('item-' + id);
+  if (el) el.remove();
+  delete itemData[id];
+}
 
-  var fotoArchivo = null;
+function fotoSel(input) {
+  if (!input.files || !input.files[0]) return;
+  fotoArchivo = input.files[0];
+  var url = URL.createObjectURL(fotoArchivo);
+  document.getElementById('foto-prev').src = url;
+  document.getElementById('foto-prev').classList.add('show');
+  document.getElementById('foto-ph').style.display = 'none';
+  document.getElementById('foto-ch').classList.add('show');
+}
 
-  function fotoSeleccionada(input) {
-    if (!input.files || !input.files[0]) return;
-    fotoArchivo = input.files[0];
-    var url = URL.createObjectURL(fotoArchivo);
-    var prev = document.getElementById('foto-preview');
-    prev.src = url;
-    prev.classList.add('show');
-    document.getElementById('foto-placeholder').style.display = 'none';
-    document.getElementById('foto-change').classList.add('show');
-  }
+function generar() {
+  var v = document.getElementById('vendedor').value;
+  var c = document.getElementById('cliente').value.trim();
+  var errEl = document.getElementById('error');
+  var bloques = document.querySelectorAll('.item-block');
+  var items = [];
 
-  function generar() {
-    var v = document.getElementById('vendedor').value;
-    var c = document.getElementById('cliente').value.trim();
-    var errEl = document.getElementById('error');
-    var bloques = document.querySelectorAll('.item-block');
-    var items = [];
-
-    bloques.forEach(function(b) {
-      var m = b.id.match(/item-(\d+)/);
-      if (!m) return;
-      var id = m[1];
-      var cod = (document.getElementById('cod-' + id)||{}).value||'';
-      var desc = (document.getElementById('desc-' + id)||{}).value||'';
-      var bul = parseInt((document.getElementById('bul-' + id)||{}).value)||0;
-      cod = cod.trim().toUpperCase();
-      desc = desc.trim();
-      if (cod && bul > 0) items.push({ codigo: 'MELECH-' + cod, descripcion: desc, bultos: bul });
-    });
-
-    if (!v || !c || items.length === 0) { errEl.classList.add('show'); return; }
-    errEl.classList.remove('show');
-
-    var fecha = new Date().toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' });
-    var hora = new Date().toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
-    var nro = nroPedido++;
-    localStorage.setItem('nroPedido', nroPedido);
-
-    document.getElementById('res-cliente').textContent = 'Cliente: ' + c;
-    document.getElementById('res-meta').textContent = 'Vendedor: ' + v + '  ·  Pedido #' + nro + '  ·  ' + fecha + ' ' + hora;
-
-    var tbody = document.getElementById('res-body');
-    tbody.innerHTML = '';
-    var total = 0;
-    var msg = 'PEDIDO #' + nro + '\n' + fecha + ' ' + hora + '\nVendedor: ' + v + '\nCliente: ' + c + '\n--------------------\n';
-
-    items.forEach(function(it) {
-      var tr = document.createElement('tr');
-      tr.innerHTML =
-        '<td class="td-cod">[' + it.codigo + ']</td>' +
-        '<td class="td-desc">' + (it.descripcion || '—') + '</td>' +
-        '<td class="td-bul">' + it.bultos + '</td>';
-      tbody.appendChild(tr);
-      total += it.bultos;
-      msg += '[' + it.codigo + '] ' + (it.descripcion || '') + ': ' + it.bultos + ' bulto' + (it.bultos===1?'':'s') + '\n';
-    });
-
-    document.getElementById('res-total').textContent = total;
-    msg += '--------------------\nTOTAL: ' + total + ' bulto' + (total===1?'':'s');
-    mensajeActual = msg;
-
-    document.getElementById('result-card').classList.add('show');
-    document.getElementById('result-card').scrollIntoView({ behavior:'smooth', block:'start' });
-  }
-
-  function compartir() {
-    if (navigator.share && fotoArchivo) {
-      // Compartir texto + foto juntos
-      navigator.share({ text: mensajeActual, files: [fotoArchivo] }).catch(function() {
-        // Si falla con archivo, compartir solo texto
-        navigator.share({ text: mensajeActual });
-      });
-    } else if (navigator.share) {
-      navigator.share({ text: mensajeActual });
-    } else {
-      window.open('https://wa.me/?text=' + encodeURIComponent(mensajeActual), '_blank');
+  bloques.forEach(function(b) {
+    var m = b.id.match(/item-(\d+)/);
+    if (!m) return;
+    var id = parseInt(m[1]);
+    var p = itemData[id];
+    if (!p) return;
+    var val = parseInt(document.getElementById('bul-' + id).value) || 0;
+    var modo = itemModo[id] || 'bultos';
+    if (val > 0) {
+      var bul, uni;
+      if (modo === 'unidades') {
+        bul = null; uni = val;
+      } else {
+        bul = val; uni = p.upb ? val * p.upb : null;
+      }
+      items.push({ p: p, bul: bul, uni: uni, modo: modo, val: val });
     }
-  }
+  });
 
-  function nuevo() {
-    document.getElementById('vendedor').value = '';
-    document.getElementById('cliente').value = '';
-    document.getElementById('items-container').innerHTML = '';
-    document.getElementById('result-card').classList.remove('show');
-    document.getElementById('error').classList.remove('show');
-    itemCount = 0; mensajeActual = ''; fotoArchivo = null;
-    document.getElementById('foto-input').value = '';
-    var prev = document.getElementById('foto-preview');
-    prev.classList.remove('show'); prev.src = '';
-    document.getElementById('foto-placeholder').style.display = '';
-    document.getElementById('foto-change').classList.remove('show');
-    agregarItem(); agregarItem();
-    window.scrollTo({ top:0, behavior:'smooth' });
-  }
+  // Validar exceso de stock
+  var hayExceso = false;
+  document.querySelectorAll('.item-block').forEach(function(b) {
+    var m = b.id.match(/item-(\d+)/);
+    if (!m) return;
+    var id = parseInt(m[1]);
+    var p = itemData[id];
+    if (!p || p.stock <= 0) return;
+    var modo = itemModo[id] || 'bultos';
+    var val = parseInt((document.getElementById('bul-' + id)||{}).value) || 0;
+    var unidades = modo === 'unidades' ? val : (p.upb ? val * p.upb : val);
+    if (unidades > p.stock && unidades > 0) hayExceso = true;
+  });
 
+  if (!v || !c || items.length === 0) { errEl.classList.add('show'); return; }
+  if (hayExceso) {
+    errEl.textContent = '⛔ Hay productos que superan el stock disponible. Corregí las cantidades antes de continuar.';
+    errEl.classList.add('show');
+    return;
+  }
+  errEl.textContent = 'Completá el vendedor, el cliente y al menos un artículo.';
+  errEl.classList.remove('show');
+
+  var fecha = new Date().toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' });
+  var hora = new Date().toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
+  var nro = nroPedido++;
+  localStorage.setItem('nroPedido', nroPedido);
+
+  document.getElementById('res-cli').textContent = 'Cliente: ' + c;
+  document.getElementById('res-meta').textContent = 'Vendedor: ' + v + '  ·  Pedido #' + nro + '  ·  ' + fecha + ' ' + hora;
+
+  var tbody = document.getElementById('res-body');
+  tbody.innerHTML = '';
+  var totBul = 0, totUni = 0;
+  var msg = 'PEDIDO #' + nro + '\n' + fecha + ' ' + hora + '\nVendedor: ' + v + '\nCliente: ' + c + '\n--------------------\n';
+
+  items.forEach(function(it) {
+    var tr = document.createElement('tr');
+    var uniStr = it.uni ? it.uni.toLocaleString('es-AR') : '—';
+    var precioStr = it.p.precio > 0 ? it.p.moneda + ' ' + it.p.precio.toLocaleString('es-AR', {minimumFractionDigits:2}) : '';
+    var bulCell = it.modo === 'unidades' ? '—' : it.bul;
+    tr.innerHTML =
+      '<td><div class="td-cod">[' + it.p.cod + ']</div></td>' +
+      '<td><div class="td-nombre">' + it.p.nombre + (it.p.stock <= 0 ? ' <span style="color:#c0392b;font-size:11px;font-weight:700;">⚠️ SIN STOCK</span>' : '') + '</div>' +
+         (precioStr ? '<div class="td-sub">' + precioStr + '</div>' : '') + '</td>' +
+      '<td class="td-r">' + bulCell + '</td>' +
+      '<td class="td-r">' + uniStr + '</td>';
+    tbody.appendChild(tr);
+    if (it.bul) totBul += it.bul;
+    if (it.uni) totUni += it.uni;
+    var sinStockMsg = it.p.stock <= 0 ? ' ⚠️ SIN STOCK' : '';
+    var linea;
+    if (it.modo === 'unidades') {
+      linea = '[' + it.p.cod + '] ' + it.p.nombre + ': ' + it.uni + ' unidades sueltas' + sinStockMsg;
+    } else {
+      var uniMsgStr = it.uni ? ' (' + it.uni.toLocaleString('es-AR') + ' u.)' : '';
+      linea = '[' + it.p.cod + '] ' + it.p.nombre + ': ' + it.bul + ' bulto' + (it.bul===1?'':'s') + uniMsgStr + sinStockMsg;
+    }
+    msg += linea + '\n';
+  });
+
+  document.getElementById('res-tot-bul').textContent = totBul;
+  document.getElementById('res-tot-uni').textContent = totUni > 0 ? totUni.toLocaleString('es-AR') : '—';
+  msg += '--------------------\nTOTAL: ' + totBul + ' bulto' + (totBul===1?'':'s');
+  if (totUni > 0) msg += ' / ' + totUni.toLocaleString('es-AR') + ' unidades';
+  mensajeActual = msg;
+
+  document.getElementById('result-card').classList.add('show');
+  document.getElementById('result-card').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function compartir() {
+  if (navigator.share && fotoArchivo) {
+    navigator.share({ text: mensajeActual, files: [fotoArchivo] }).catch(function() {
+      navigator.share({ text: mensajeActual });
+    });
+  } else if (navigator.share) {
+    navigator.share({ text: mensajeActual });
+  } else {
+    window.open('https://wa.me/?text=' + encodeURIComponent(mensajeActual), '_blank');
+  }
+}
+
+function nuevo() {
+  document.getElementById('vendedor').value = '';
+  document.getElementById('cliente').value = '';
+  document.getElementById('items-container').innerHTML = '';
+  document.getElementById('result-card').classList.remove('show');
+  document.getElementById('error').classList.remove('show');
+  document.getElementById('foto-input').value = '';
+  document.getElementById('foto-prev').classList.remove('show');
+  document.getElementById('foto-prev').src = '';
+  document.getElementById('foto-ph').style.display = '';
+  document.getElementById('foto-ch').classList.remove('show');
+  itemCount = 0; itemData = {}; itemModo = {}; mensajeActual = ''; fotoArchivo = null;
   agregarItem();
-  agregarItem();
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+agregarItem();
 </script>
 </body>
 </html>
