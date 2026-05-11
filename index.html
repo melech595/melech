@@ -522,23 +522,43 @@ function cAdd(){
   });
   div.appendChild(fr);
 
-  var mg=document.createElement('div');mg.className='mg';
+  // 1. PESOS
   var mx1=document.createElement('div');mx1.className='mx';
-  var mxl1=document.createElement('div');mxl1.className='mxl';mxl1.textContent='Monto ARS ($)';
+  var mxl1=document.createElement('div');mxl1.className='mxl';mxl1.textContent='$ Pesos (ARS)';
   var ca=document.createElement('input');ca.type='number';ca.id='ca'+id;ca.placeholder='0';ca.min='0';
   ca.addEventListener('input',(function(i){return function(){cCalc(i);cChk(i);};})(id));
   mx1.appendChild(mxl1);mx1.appendChild(ca);
-  var mx2=document.createElement('div');mx2.className='mx cot';
-  var mxl2=document.createElement('div');mxl2.className='mxl';mxl2.textContent='💱 Cotiz. blue';
-  var cq=document.createElement('input');cq.type='number';cq.id='cq'+id;cq.placeholder='ej: 1250';cq.min='0';
-  cq.addEventListener('input',(function(i){return function(){cCalc(i);};})(id));
-  mx2.appendChild(mxl2);mx2.appendChild(cq);
-  mg.appendChild(mx1);mg.appendChild(mx2);div.appendChild(mg);
+  div.appendChild(mx1);
 
-  var eq=document.createElement('div');eq.className='mx eq';eq.style.marginTop='8px';
-  var eql=document.createElement('div');eql.className='mxl';eql.textContent='Equiv. USD (auto)';
-  var eqv=document.createElement('div');eqv.className='eqv';eqv.id='ceq'+id;eqv.textContent='—';
-  eq.appendChild(eql);eq.appendChild(eqv);div.appendChild(eq);
+  // 2. COTIZACION (debajo de pesos)
+  var cqw=document.createElement('div');
+  cqw.style.cssText='margin-top:6px;background:#fef0e3;border:1.5px solid #e67e22;border-radius:8px;padding:10px 12px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px';
+  var cql=document.createElement('div');
+  var cqlt=document.createElement('div');cqlt.className='mxl';cqlt.textContent='💱 Cotización blue';cqlt.style.marginBottom='4px';
+  var cqs=document.createElement('div');cqs.style.cssText='font-size:10px;color:#888';cqs.textContent='(opcional)';
+  cql.appendChild(cqlt);cql.appendChild(cqs);
+  var cq=document.createElement('input');cq.type='number';cq.id='cq'+id;cq.placeholder='ej: 1250';cq.min='0';
+  cq.style.cssText='border:none!important;font-size:18px;font-weight:700;color:#e67e22;background:transparent;padding:0!important;width:100%;outline:none;text-align:right';
+  cq.addEventListener('input',(function(i){return function(){cCalc(i);};})(id));
+  cqw.appendChild(cql);cqw.appendChild(cq);div.appendChild(cqw);
+
+  // 3. USD DIRECTO
+  var mx2=document.createElement('div');mx2.className='mx';
+  mx2.style.cssText='margin-top:6px;border-color:#1a3f6b;background:#e8f0f5';
+  var mxl2=document.createElement('div');mxl2.className='mxl';mxl2.textContent='U$S Dólares (directo)';
+  var cu=document.createElement('input');cu.type='number';cu.id='cu'+id;cu.placeholder='0,00';cu.min='0';cu.step='0.01';
+  cu.style.color='#1a3f6b';
+  cu.addEventListener('input',(function(i){return function(){cCalc(i);cChk(i);};})(id));
+  mx2.appendChild(mxl2);mx2.appendChild(cu);div.appendChild(mx2);
+
+  // 4. TOTAL U$S (pesos/cotiz + usd directo)
+  var eq=document.createElement('div');eq.id='eqw'+id;eq.style.display='none';
+  eq.style.cssText='display:none;margin-top:6px;background:#1a3f6b;border-radius:8px;padding:10px 14px';
+  var eqrow=document.createElement('div');eqrow.style.cssText='display:flex;justify-content:space-between;align-items:center';
+  var eql=document.createElement('div');eql.style.cssText='font-size:11px;font-weight:700;text-transform:uppercase;color:rgba(255,255,255,0.7)';eql.textContent='= Total U$S';
+  var eqv=document.createElement('div');eqv.id='ceq'+id;eqv.style.cssText='font-size:20px;font-weight:700;color:#fff';eqv.textContent='—';
+  eqrow.appendChild(eql);eqrow.appendChild(eqv);eq.appendChild(eqrow);
+  div.appendChild(eq);
 
   var l3=document.createElement('label');l3.textContent='Observación (opcional)';div.appendChild(l3);
   var ta=document.createElement('textarea');ta.id='co'+id;ta.placeholder='Ej: pago parcial, cheque 15/06...';ta.style.height='60px';div.appendChild(ta);
@@ -559,19 +579,35 @@ function cForma(id,f){
 function cCalc(id){
   var a=parseFloat((document.getElementById('ca'+id)||{}).value)||0;
   var q=parseFloat((document.getElementById('cq'+id)||{}).value)||0;
-  var eq=document.getElementById('ceq'+id);if(!eq)return;
-  if(a>0&&q>0)eq.textContent='US$ '+(a/q).toLocaleString('es-AR',{minimumFractionDigits:2});
-  else eq.textContent='—';
+  var u=parseFloat((document.getElementById('cu'+id)||{}).value)||0;
+  var eqw=document.getElementById('eqw'+id);
+  var eqv=document.getElementById('ceq'+id);
+  var usdDeCambio=q>0&&a>0?a/q:0;
+  var totalUSD=u+usdDeCambio;
+  if(totalUSD>0){
+    if(eqw)eqw.style.display='block';
+    if(eqv){
+      var txt='';
+      if(usdDeCambio>0&&u>0)txt='$'+a.toLocaleString('es-AR')+'÷'+q.toLocaleString('es-AR')+'='+fU(usdDeCambio)+' + '+fU(u)+' = '+fU(totalUSD);
+      else if(usdDeCambio>0)txt='$'+a.toLocaleString('es-AR')+' ÷ '+q.toLocaleString('es-AR')+' = '+fU(usdDeCambio);
+      else txt=fU(u);
+      eqv.textContent=txt;
+    }
+  } else {
+    if(eqw)eqw.style.display='none';
+  }
+  cChk(id);
 }
 
 function cChk(id){
   var c=((document.getElementById('cc'+id)||{}).value||'').trim();
-  var a=(document.getElementById('ca'+id)||{}).value||0;
-  var b=document.getElementById('cb'+id);if(b)b.classList.toggle('ok',c!==''&&a>0);
+  var a=parseFloat((document.getElementById('ca'+id)||{}).value)||0;
+  var u=parseFloat((document.getElementById('cu'+id)||{}).value)||0;
+  var b=document.getElementById('cb'+id);if(b)b.classList.toggle('ok',c!==''&&(a>0||u>0));
 }
 
-function fA(n){return n>0?'$'+n.toLocaleString('es-AR',{minimumFractionDigits:2}):'-';}
-function fU(n){return n>0?'US$ '+n.toLocaleString('es-AR',{minimumFractionDigits:2}):'-';}
+function fA(n){if(!n||n<=0)return'-';var d=n%1===0?0:2;return'$'+n.toLocaleString('es-AR',{minimumFractionDigits:d,maximumFractionDigits:2});}
+function fU(n){if(!n||n<=0)return'-';var d=n%1===0?0:2;return'U$S '+n.toLocaleString('es-AR',{minimumFractionDigits:d,maximumFractionDigits:2});}
 
 function cGen(){
   var v=(document.getElementById('cv')||{}).value||'';
@@ -581,11 +617,13 @@ function cGen(){
     var id=parseInt(b.id.replace('cb',''));if(!id)return;
     var cli=((document.getElementById('cc'+id)||{}).value||'').trim();
     var ars=parseFloat((document.getElementById('ca'+id)||{}).value)||0;
+    var usd=parseFloat((document.getElementById('cu'+id)||{}).value)||0;
     var cotiz=parseFloat((document.getElementById('cq'+id)||{}).value)||0;
     var obs=((document.getElementById('co'+id)||{}).value||'').trim();
     var forma=cF[id]||'efectivo';
-    var usd=cotiz>0&&ars>0?ars/cotiz:0;
-    if(cli&&ars>0)cobros.push({cli:cli,ars:ars,cotiz:cotiz,usd:usd,forma:forma,obs:obs});
+    // Si hay cotización, sumar el equivalente al USD directo
+    var usdTotal=usd+(cotiz>0&&ars>0?ars/cotiz:0);
+    if(cli&&(ars>0||usd>0))cobros.push({cli:cli,ars:ars,usd:usdTotal,usdDir:usd,cotiz:cotiz,forma:forma,obs:obs});
   });
   if(!v||!cobros.length){if(err)err.classList.add('on');return;}
   if(err)err.classList.remove('on');
@@ -599,14 +637,21 @@ function cGen(){
   var msg='💰 *COBRANZAS — '+v.toUpperCase()+'*\n📅 '+fecha+' — '+hora+'\n\n';
   cobros.forEach(function(c,i){
     var tr=document.createElement('tr');
+    var arsStr=c.ars>0?fA(c.ars):'-';
+    var usdStr=c.usd>0?fU(c.usd):'-';
     tr.innerHTML='<td><div class="tno">'+c.cli+'</div>'+(c.obs?'<div style="font-size:10px;color:#888">'+c.obs+'</div>':'')+
-      '</td><td style="font-size:11px">'+fL[c.forma]+'</td><td class="tr3">'+fA(c.ars)+'</td><td class="tr3" style="color:#1a3f6b">'+fU(c.usd)+'</td>';
+      '</td><td style="font-size:11px">'+fL[c.forma]+'</td><td class="tr3">'+arsStr+'</td><td class="tr3" style="color:#1a3f6b">'+usdStr+'</td>';
     if(tbody)tbody.appendChild(tr);
     tA+=c.ars;tU+=c.usd;
-    msg+='*'+(i+1)+'. '+c.cli+'*\n   '+fL[c.forma]+'\n   💵 '+fA(c.ars);
-    if(c.cotiz>0)msg+=' (cotiz. $'+Math.round(c.cotiz).toLocaleString('es-AR')+')';
-    msg+='\n';if(c.usd>0)msg+='   💲 '+fU(c.usd)+'\n';
-    if(c.obs)msg+='   📝 '+c.obs+'\n';msg+='\n';
+    msg+='*'+(i+1)+'. '+c.cli+'*\n';
+    msg+='   '+fL[c.forma]+'\n';
+    if(c.ars>0)msg+='   💵 $'+c.ars.toLocaleString('es-AR')+'\n';
+    if(c.cotiz>0&&c.ars>0)msg+='   💱 Cotiz. $'+c.cotiz.toLocaleString('es-AR')+'\n';
+    if(c.usdDir>0)msg+='   💲 U$S '+c.usdDir.toLocaleString('es-AR',{minimumFractionDigits:c.usdDir%1===0?0:2,maximumFractionDigits:2})+'\n';
+    var totalUSD=(c.usdDir||0)+(c.cotiz>0&&c.ars>0?c.ars/c.cotiz:0);
+    if(totalUSD>0)msg+='   ✅ Total U$S: '+totalUSD.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2})+'\n';
+    if(c.obs)msg+='   📝 '+c.obs+'\n';
+    msg+='\n';
   });
   var cta=document.getElementById('cta');if(cta)cta.textContent=fA(tA);
   var ctu=document.getElementById('ctu');if(ctu)ctu.textContent=tU>0?fU(tU):'-';
