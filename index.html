@@ -130,7 +130,21 @@ td{padding:8px 10px;vertical-align:middle}
 <option>Salo</option>
 <option>Axel</option></select>
     <label>Cliente</label>
-    <input type="text" id="pc" placeholder="Nombre del cliente" autocomplete="off">
+    <div style="position:relative">
+      <input type="text" id="pc" placeholder="Buscá cliente en Cianbox..." autocomplete="off" oninput="pBuscarCliente(this.value)">
+      <div id="pc-dd" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid var(--ac);border-top:none;border-radius:0 0 8px 8px;max-height:200px;overflow-y:auto;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,.1)"></div>
+    </div>
+    <div id="pc-info" style="display:none;margin-top:8px;background:var(--gl);border:1.5px solid var(--gr);border-radius:8px;padding:10px 12px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--gr);margin-bottom:6px">📍 Datos de entrega</div>
+      <div id="pc-info-txt" style="font-size:13px;color:var(--t);line-height:1.6"></div>
+      <button onclick="pLimpiarCliente()" style="margin-top:6px;background:none;border:none;color:var(--re);font-size:12px;cursor:pointer;padding:0">✕ Cambiar cliente</button>
+    </div>
+    <div id="pc-manual" style="display:none;margin-top:8px">
+      <div style="font-size:11px;color:var(--mu);margin-bottom:6px">📍 Datos de entrega (cargar manualmente)</div>
+      <input type="text" id="pc-dom" placeholder="Domicilio" autocomplete="off" style="margin-bottom:6px">
+      <input type="text" id="pc-loc" placeholder="Localidad / Provincia" autocomplete="off" style="margin-bottom:6px">
+      <input type="text" id="pc-tel" placeholder="Teléfono / Celular" autocomplete="off">
+    </div>
   </div>
   <div class="card">
     <div class="ct">Artículos</div>
@@ -235,6 +249,88 @@ function ir(s){
 }
 
 // PEDIDOS
+// ── CIANBOX API ───────────────────────────────────────────────────
+// Usar producción si estamos en pages.dev o en github.io (autenticado)
+// Staging solo para desarrollo local
+var API_BASE = (location.hostname === 'melech-mini-apps.pages.dev' || 
+                location.hostname.endsWith('github.io') ||
+                location.hostname.endsWith('pages.dev'))
+  ? 'https://melech-mini-apps-api.nouveau-gamas-2e.workers.dev'
+  : 'https://melech-mini-apps-api-staging.nouveau-gamas-2e.workers.dev';
+
+var pClienteSeleccionado = null;
+var pClienteBuscarTimer = null;
+
+function pBuscarCliente(q) {
+  q = (q||'').trim();
+  var dd = document.getElementById('pc-dd');
+  clearTimeout(pClienteBuscarTimer);
+  if(q.length < 2) { dd.style.display='none'; return; }
+  pClienteBuscarTimer = setTimeout(function(){
+    dd.innerHTML = '<div style="padding:10px;font-size:12px;color:var(--mu)">Buscando...</div>';
+    dd.style.display = 'block';
+    fetch(API_BASE + '/cianbox/clientes?search=' + encodeURIComponent(q))
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        var clientes = data.body || [];
+        if(!clientes.length){
+          dd.innerHTML = '<div style="padding:10px;font-size:12px;color:var(--mu)">Sin resultados — <a href="#" onclick="pUsarManual();return false" style="color:var(--ac)">cargar manualmente</a></div>';
+          return;
+        }
+        dd.innerHTML = '';
+        clientes.slice(0,8).forEach(function(c){
+          var d = document.createElement('div');
+          d.style.cssText = 'padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--bo);font-size:13px';
+          d.innerHTML = '<div style="font-weight:600">' + (c.razon||'') + '</div>' +
+            '<div style="font-size:11px;color:var(--mu)">' + (c.domicilio||'') + (c.localidad ? ' · ' + c.localidad : '') + '</div>';
+          d.addEventListener('mouseover', function(){ this.style.background='var(--al)'; });
+          d.addEventListener('mouseout', function(){ this.style.background=''; });
+          d.addEventListener('click', function(){ pSeleccionarCliente(c); });
+          dd.appendChild(d);
+        });
+        // Opción cargar manual al final
+        var manual = document.createElement('div');
+        manual.style.cssText = 'padding:8px 12px;font-size:12px;color:var(--ac);cursor:pointer;background:#f8f8f6;border-top:1px solid var(--bo)';
+        manual.textContent = '+ Cargar datos manualmente';
+        manual.addEventListener('click', pUsarManual);
+        dd.appendChild(manual);
+      })
+      .catch(function(){
+        dd.innerHTML = '<div style="padding:10px;font-size:12px;color:var(--mu)">Error buscando — <a href="#" onclick="pUsarManual();return false" style="color:var(--ac)">cargar manualmente</a></div>';
+      });
+  }, 400);
+}
+
+function pSeleccionarCliente(c) {
+  pClienteSeleccionado = c;
+  document.getElementById('pc').value = c.razon || '';
+  document.getElementById('pc-dd').style.display = 'none';
+  document.getElementById('pc-manual').style.display = 'none';
+  // Mostrar info
+  var partes = [];
+  if(c.domicilio) partes.push('🏠 ' + c.domicilio);
+  if(c.localidad) partes.push('📍 ' + c.localidad + (c.provincia ? ', ' + c.provincia : ''));
+  if(c.telefono)  partes.push('📞 ' + c.telefono);
+  if(c.celular && c.celular !== c.telefono) partes.push('📱 ' + c.celular);
+  document.getElementById('pc-info-txt').innerHTML = partes.join('<br>') || 'Sin datos de entrega';
+  document.getElementById('pc-info').style.display = 'block';
+}
+
+function pUsarManual() {
+  pClienteSeleccionado = null;
+  document.getElementById('pc-dd').style.display = 'none';
+  document.getElementById('pc-info').style.display = 'none';
+  document.getElementById('pc-manual').style.display = 'block';
+}
+
+function pLimpiarCliente() {
+  pClienteSeleccionado = null;
+  document.getElementById('pc').value = '';
+  document.getElementById('pc-info').style.display = 'none';
+  document.getElementById('pc-manual').style.display = 'none';
+  document.getElementById('pc').focus();
+}
+
 document.getElementById('pAddBtn').addEventListener('click',pAdd);
 document.getElementById('pGenBtn').addEventListener('click',pGen);
 document.getElementById('pShBtn').addEventListener('click',pShare);
@@ -464,14 +560,38 @@ function pGen(){
   if(tU>0)msg+=' / '+tU.toLocaleString('es-AR')+' u.';
   if(desc>0)msg+='\n💸 Descuento: '+desc+'%';
   if(obs)msg+='\n📝 OBS: '+obs;
+  // Datos de entrega
+  var entrega = '';
+  if(pClienteSeleccionado) {
+    var c = pClienteSeleccionado;
+    entrega += '\n--------------------';
+    entrega += '\n📦 DATOS DE ENTREGA';
+    if(c.domicilio) entrega += '\n🏠 ' + c.domicilio;
+    if(c.localidad) entrega += '\n📍 ' + c.localidad + (c.provincia ? ', ' + c.provincia : '');
+    if(c.telefono)  entrega += '\n📞 ' + c.telefono;
+    if(c.celular && c.celular !== c.telefono) entrega += '\n📱 ' + c.celular;
+  } else {
+    var dom = (document.getElementById('pc-dom')||{}).value||'';
+    var loc = (document.getElementById('pc-loc')||{}).value||'';
+    var tel = (document.getElementById('pc-tel')||{}).value||'';
+    if(dom||loc||tel) {
+      entrega += '\n--------------------';
+      entrega += '\n📦 DATOS DE ENTREGA';
+      if(dom) entrega += '\n🏠 ' + dom;
+      if(loc) entrega += '\n📍 ' + loc;
+      if(tel) entrega += '\n📞 ' + tel;
+    }
+  }
+  msg += entrega;
   pMsg=msg;
   var pr=document.getElementById('pr');
   if(pr){pr.classList.add('on');pr.scrollIntoView({behavior:'smooth',block:'start'});}
 }
 
 function pShare(){
-  if(navigator.share)navigator.share({text:pMsg}).catch(function(){});
-  else window.open('https://wa.me/?text='+encodeURIComponent(pMsg),'_blank');
+  var waUrl = 'https://wa.me/?text=' + encodeURIComponent(pMsg);
+  if(navigator.share) navigator.share({text:pMsg}).catch(function(){ window.open(waUrl,'_blank'); });
+  else window.open(waUrl,'_blank');
 }
 
 function pNew(){
@@ -480,7 +600,7 @@ function pNew(){
   var pr=document.getElementById('pr');if(pr)pr.classList.remove('on');
   var pe=document.getElementById('pe');if(pe)pe.classList.remove('on');
   var pdt=document.getElementById('pdt');if(pdt)pdt.textContent='—';
-  pN=0;pD={};pM={};pMsg='';
+  pN=0;pD={};pM={};pMsg='';pClienteSeleccionado=null;pLimpiarCliente();
   pAdd();window.scrollTo({top:0,behavior:'smooth'});
 }
 
