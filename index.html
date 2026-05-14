@@ -105,6 +105,17 @@ td{padding:8px 10px;vertical-align:middle}
 .eqv{font-size:20px;font-weight:700;color:var(--ac)}
 .vrow{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--bo);margin-bottom:8px}
 .vdel{background:none;border:none;color:var(--re);font-size:20px;cursor:pointer;padding:0 4px}
+.pg-item{padding:12px;border:1px solid var(--bo);border-radius:8px;margin-bottom:8px;background:var(--bg)}
+.pg-item:last-child{margin-bottom:0}
+.pg-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.pg-info{flex:1;min-width:0}
+.pg-num{font-size:12px;font-weight:700;color:var(--ac)}
+.pg-cli{font-size:14px;font-weight:600;margin-top:2px}
+.pg-det{font-size:11px;color:var(--mu);margin-top:2px}
+.pg-btns{display:flex;gap:6px;margin-top:8px}
+.pg-btn-e{padding:6px 12px;background:var(--ac);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.pg-btn-c{padding:6px 12px;background:#25D366;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.pg-btn-d{padding:6px 10px;background:var(--rl);color:var(--re);border:1px solid #e8c5c2;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
 </style>
 </head>
 <body>
@@ -116,10 +127,21 @@ td{padding:8px 10px;vertical-align:middle}
 </nav>
 
 <div class="sec on" id="sec-p">
-<header style="background:var(--ac);color:#fff;padding:18px 20px 14px">
-  <h1 style="font-size:18px;font-weight:700">Cargar pedido</h1>
-  <p style="font-size:12px;opacity:.75;margin-top:2px">Buscá el producto y completá los bultos</p>
+<header style="background:var(--ac);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center">
+  <div>
+    <h1 style="font-size:18px;font-weight:700">Cargar pedido</h1>
+    <p style="font-size:12px;opacity:.75;margin-top:2px">Buscá el producto y completá los bultos</p>
+  </div>
+  <button id="verPedidosBtn" style="padding:7px 12px;background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">📋 Mis pedidos</button>
 </header>
+<!-- PANEL PEDIDOS GUARDADOS -->
+<div id="panel-guardados" style="display:none;background:#fff;border-bottom:2px solid var(--bo)">
+  <div style="padding:14px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--bo)">
+    <span style="font-size:14px;font-weight:700;color:var(--t)">📋 Pedidos guardados</span>
+    <button id="cerrarGuardadosBtn" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--mu)">×</button>
+  </div>
+  <div id="lista-guardados" style="padding:12px 20px;max-height:50vh;overflow-y:auto"></div>
+</div>
 <div class="body">
   <div class="card">
     <div class="ct">Datos</div>
@@ -202,9 +224,9 @@ td{padding:8px 10px;vertical-align:middle}
   <div class="rc" id="cr">
     <div class="rh"><div class="rl" id="crl"></div><div class="rm2" id="crm"></div></div>
     <table>
-      <thead><tr><th>Cliente</th><th>Forma</th><th class="r">ARS</th><th class="r">USD</th></tr></thead>
+      <thead><tr><th>Cliente</th><th>Forma</th><th class="r">Monto</th></tr></thead>
       <tbody id="crb"></tbody>
-      <tfoot><tr class="tfr"><td colspan="2">TOTAL</td><td class="tfn" id="cta">-</td><td class="tfn" id="ctu">-</td></tr></tfoot>
+      <tfoot><tr class="tfr"><td colspan="2">TOTAL</td><td class="tfn" id="ctot">-</td></tr></tfoot>
     </table>
     <div class="btnrow"><button class="shbtn" id="cShBtn">📲 Enviar al grupo</button><button class="nwbtn" id="cNwBtn">Nuevo</button></div>
   </div>
@@ -584,6 +606,13 @@ function pGen(){
   }
   msg += entrega;
   pMsg=msg;
+
+  // Guardar pedido
+  var itemsGuardados = items.map(function(it){
+    return {cod:it.p.cod, val:it.val, modo:it.modo, excl:it.excl};
+  });
+  guardarPedido(nro, v, c, itemsGuardados, desc, obs, msg);
+
   var pr=document.getElementById('pr');
   if(pr){pr.classList.add('on');pr.scrollIntoView({behavior:'smooth',block:'start'});}
 }
@@ -757,12 +786,18 @@ function cGen(){
   var msg='💰 *COBRANZAS — '+v.toUpperCase()+'*\n📅 '+fecha+' — '+hora+'\n\n';
   cobros.forEach(function(c,i){
     var tr=document.createElement('tr');
-    var arsStr=c.ars>0?fA(c.ars):'-';
-    var usdStr=c.usd>0?fU(c.usd):'-';
+    var montoStr='';
+    if(c.ars>0) montoStr+=fA(c.ars);
+    if(c.ars>0&&c.usd>0) montoStr+=' + ';
+    if(c.usd>0) montoStr+=fU(c.usd);
+    if(!montoStr) montoStr='-';
     tr.innerHTML='<td><div class="tno">'+c.cli+'</div>'+(c.obs?'<div style="font-size:10px;color:#888">'+c.obs+'</div>':'')+
-      '</td><td style="font-size:11px">'+fL[c.forma]+'</td><td class="tr3">'+arsStr+'</td><td class="tr3" style="color:#1a3f6b">'+usdStr+'</td>';
+      '</td><td style="font-size:11px">'+fL[c.forma]+'</td><td class="tr3">'+montoStr+'</td>';
     if(tbody)tbody.appendChild(tr);
-    tA+=c.ars;tU+=c.usd;
+    tA+=c.ars;
+    // Total USD: directo + conversión de pesos si hay cotización
+    var usdEste=(c.usdDir||0)+(c.cotiz>0&&c.ars>0?c.ars/c.cotiz:0);
+    tU+=usdEste;
     msg+='*'+(i+1)+'. '+c.cli+'*\n';
     msg+='   '+fL[c.forma]+'\n';
     if(c.ars>0)msg+='   💵 $'+c.ars.toLocaleString('es-AR')+'\n';
@@ -773,9 +808,17 @@ function cGen(){
     if(c.obs)msg+='   📝 '+c.obs+'\n';
     msg+='\n';
   });
-  var cta=document.getElementById('cta');if(cta)cta.textContent=fA(tA);
-  var ctu=document.getElementById('ctu');if(ctu)ctu.textContent=tU>0?fU(tU):'-';
-  msg+='TOTAL ARS: '+fA(tA);if(tU>0)msg+='\nTOTAL USD: '+fU(tU);
+  // Total: si hay USD (directo o por cotización) mostrar todo en U$S
+  // Si no hay USD mostrar en $
+  var ctot=document.getElementById('ctot');
+  if(tU>0){
+    if(ctot)ctot.textContent='TOTAL U$S: '+fU(tU);
+    msg+='💲 TOTAL U$S: '+fU(tU)+'\n';
+    if(tA>0) msg+='   (incluye $'+tA.toLocaleString('es-AR')+' convertidos)\n';
+  } else {
+    if(ctot)ctot.textContent='TOTAL $: '+fA(tA);
+    msg+='💵 TOTAL $: '+fA(tA)+'\n';
+  }
   cMsg=msg;
   var cr=document.getElementById('cr');
   if(cr){cr.classList.add('on');cr.scrollIntoView({behavior:'smooth',block:'start'});}
@@ -822,6 +865,147 @@ function gRender(){
 // INIT
 pAdd();
 cAdd();
+
+// ── PEDIDOS GUARDADOS ────────────────────────────────────────────
+document.getElementById('verPedidosBtn').addEventListener('click', function(){
+  var panel = document.getElementById('panel-guardados');
+  var visible = panel.style.display !== 'none';
+  panel.style.display = visible ? 'none' : 'block';
+  if(!visible) renderGuardados();
+});
+document.getElementById('cerrarGuardadosBtn').addEventListener('click', function(){
+  document.getElementById('panel-guardados').style.display = 'none';
+});
+
+function getGuardados(){
+  try{ return JSON.parse(localStorage.getItem('melech_pedidos')||'[]'); }catch(e){ return []; }
+}
+function saveGuardados(arr){
+  try{ localStorage.setItem('melech_pedidos', JSON.stringify(arr.slice(0,50))); }catch(e){}
+}
+
+function guardarPedido(nro, vendedor, cliente, items, desc, obs, msg){
+  var arr = getGuardados();
+  // Si ya existe ese número lo actualiza
+  var idx = arr.findIndex(function(p){ return p.nro === nro; });
+  var obj = {
+    nro: nro,
+    fecha: new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}),
+    hora: new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}),
+    vendedor: vendedor,
+    cliente: cliente,
+    items: items,
+    desc: desc,
+    obs: obs,
+    msg: msg
+  };
+  if(idx >= 0) arr[idx] = obj;
+  else arr.unshift(obj);
+  saveGuardados(arr);
+}
+
+function renderGuardados(){
+  var arr = getGuardados();
+  var lista = document.getElementById('lista-guardados');
+  if(!arr.length){
+    lista.innerHTML = '<div style="text-align:center;padding:20px;color:var(--mu);font-size:13px">No hay pedidos guardados</div>';
+    return;
+  }
+  lista.innerHTML = '';
+  arr.forEach(function(p){
+    var div = document.createElement('div');
+    div.className = 'pg-item';
+    var itemsStr = p.items.map(function(it){ return '['+it.cod+'] x'+it.val; }).join(', ');
+    div.innerHTML = '<div class="pg-head">' +
+      '<div class="pg-info">' +
+        '<div class="pg-num">Pedido #'+p.nro+' · '+p.fecha+' '+p.hora+'</div>' +
+        '<div class="pg-cli">'+p.cliente+'</div>' +
+        '<div class="pg-det">'+p.vendedor+' · '+p.items.length+' artículo(s)</div>' +
+        '<div class="pg-det" style="margin-top:2px">'+itemsStr+'</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="pg-btns">' +
+      '<button class="pg-btn-e" data-nro="'+p.nro+'">✏️ Editar</button>' +
+      '<button class="pg-btn-c" data-msg="'+encodeURIComponent(p.msg)+'">📲 Reenviar</button>' +
+      '<button class="pg-btn-d" data-nro="'+p.nro+'">🗑</button>' +
+    '</div>';
+    // Eventos
+    div.querySelector('.pg-btn-e').addEventListener('click', function(){
+      cargarPedidoGuardado(p);
+      document.getElementById('panel-guardados').style.display = 'none';
+    });
+    div.querySelector('.pg-btn-c').addEventListener('click', function(){
+      var msg = decodeURIComponent(this.dataset.msg);
+      var waUrl = 'https://wa.me/?text='+encodeURIComponent(msg);
+      if(navigator.share) navigator.share({text:msg}).catch(function(){ window.open(waUrl,'_blank'); });
+      else window.open(waUrl,'_blank');
+    });
+    div.querySelector('.pg-btn-d').addEventListener('click', function(){
+      var nro = +this.dataset.nro;
+      var arr2 = getGuardados().filter(function(x){ return x.nro !== nro; });
+      saveGuardados(arr2);
+      renderGuardados();
+    });
+    lista.appendChild(div);
+  });
+}
+
+function cargarPedidoGuardado(p){
+  // Limpiar
+  pNew();
+  setTimeout(function(){
+    // Vendedor
+    var pv = document.getElementById('pv');
+    if(pv) pv.value = p.vendedor;
+    // Cliente
+    var pc = document.getElementById('pc');
+    if(pc) pc.value = p.cliente;
+    // Descuento
+    var pd = document.getElementById('pd');
+    if(pd) pd.value = p.desc || '';
+    // Observaciones
+    var po = document.getElementById('po');
+    if(po) po.value = p.obs || '';
+    // Artículos
+    var pit = document.getElementById('pit');
+    if(pit) pit.innerHTML = '';
+    pN = 0;
+    p.items.forEach(function(it){
+      pAdd();
+      var id = pN;
+      // Simular selección del producto
+      var prod = CAT.find(function(x){ return x.cod === it.cod; });
+      if(prod){
+        pD[id] = prod;
+        pM[id] = it.modo || 'bultos';
+        var si = document.getElementById('si'+id);
+        if(si) si.value = '['+prod.cod+'] '+prod.nombre;
+        var inf = document.getElementById('ii'+id);
+        if(inf){
+          var pr = prod.precio>0?(prod.moneda+' '+prod.precio.toLocaleString('es-AR',{minimumFractionDigits:2})):'Sin precio';
+          var upb = prod.upb?(prod.upb+' unidades por bulto'):'Sin info';
+          var stk = prod.stock<=0?'<div class="isk1">⚠️ Sin stock</div>':'<div class="isk0">✅ Stock: '+prod.stock+' u.</div>';
+          inf.innerHTML='<div class="ico">['+prod.cod+']</div><div class="ino">'+prod.nombre+'</div><div class="ipr">'+pr+'</div><div class="iup">📦 '+upb+'</div>'+stk;
+          inf.classList.add('on');
+        }
+        var ib = document.getElementById('ib'+id);
+        if(ib) ib.classList.add('ok');
+        var mw = document.getElementById('mw'+id);
+        if(mw) mw.style.display='block';
+        var ew = document.getElementById('ew'+id);
+        if(ew) ew.style.display='block';
+        var bi = document.getElementById('bi'+id);
+        if(bi){ bi.value = it.val; pRU(id); }
+        if(it.excl){
+          var ex = document.getElementById('ex'+id);
+          if(ex) ex.checked = true;
+        }
+      }
+    });
+    pRD();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }, 100);
+}
 </script>
 </body>
 </html>
