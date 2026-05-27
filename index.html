@@ -195,7 +195,7 @@ td{padding:8px 10px;vertical-align:middle}
       <tbody id="prb"></tbody>
       <tfoot><tr class="tfr"><td colspan="2">Total</td><td class="tfn" id="ptb">—</td><td class="tfn" id="ptu">—</td></tr></tfoot>
     </table>
-    <div class="btnrow"><button class="shbtn" id="pShBtn">Compartir</button><button class="nwbtn" id="pNwBtn">Nuevo pedido</button></div>
+    <div class="btnrow" style="grid-template-columns:1fr 1fr 1fr"><button class="shbtn" id="pShBtn">📲 WhatsApp</button><button class="shbtn" id="pMailBtn" style="background:#d44638">📧 Mail a Jorge</button><button class="nwbtn" id="pNwBtn">Nuevo pedido</button></div>
   </div>
 </div>
 </div>
@@ -356,6 +356,7 @@ function pLimpiarCliente() {
 document.getElementById('pAddBtn').addEventListener('click',pAdd);
 document.getElementById('pGenBtn').addEventListener('click',pGen);
 document.getElementById('pShBtn').addEventListener('click',pShare);
+document.getElementById('pMailBtn').addEventListener('click',pMailJorge);
 document.getElementById('pNwBtn').addEventListener('click',pNew);
 document.getElementById('pd').addEventListener('input',pRD);
 
@@ -621,6 +622,13 @@ function pShare(){
   var waUrl = 'https://wa.me/?text=' + encodeURIComponent(pMsg);
   if(navigator.share) navigator.share({text:pMsg}).catch(function(){ window.open(waUrl,'_blank'); });
   else window.open(waUrl,'_blank');
+}
+
+function pMailJorge(){
+  var asunto = encodeURIComponent('Pedido Melech — ' + (document.getElementById('pc').value||'Cliente'));
+  var cuerpo = encodeURIComponent(pMsg);
+  var mailUrl = 'mailto:jorgegamaleds@gmail.com?subject=' + asunto + '&body=' + cuerpo;
+  window.open(mailUrl, '_blank');
 }
 
 function pNew(){
