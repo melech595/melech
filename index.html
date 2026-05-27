@@ -117,6 +117,7 @@ td{padding:8px 10px;vertical-align:middle}
 .pg-btn-c{padding:6px 12px;background:#25D366;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
 .pg-btn-d{padding:6px 10px;background:var(--rl);color:var(--re);border:1px solid #e8c5c2;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -195,7 +196,7 @@ td{padding:8px 10px;vertical-align:middle}
       <tbody id="prb"></tbody>
       <tfoot><tr class="tfr"><td colspan="2">Total</td><td class="tfn" id="ptb">—</td><td class="tfn" id="ptu">—</td></tr></tfoot>
     </table>
-    <div class="btnrow" style="grid-template-columns:1fr 1fr 1fr"><button class="shbtn" id="pShBtn">📲 WhatsApp</button><button class="shbtn" id="pMailBtn" style="background:#d44638">📧 Mail a Jorge</button><button class="nwbtn" id="pNwBtn">Nuevo pedido</button></div>
+    <div class="btnrow" style="grid-template-columns:1fr 1fr 1fr 1fr"><button class="shbtn" id="pShBtn">📲 WhatsApp</button><button class="shbtn" id="pMailBtn" style="background:#d44638">📧 Mail a Jorge</button><button class="shbtn" id="pXlsBtn" style="background:#1a6b4a">⬇️ Excel</button><button class="nwbtn" id="pNwBtn">Nuevo pedido</button></div>
   </div>
 </div>
 </div>
@@ -357,6 +358,7 @@ document.getElementById('pAddBtn').addEventListener('click',pAdd);
 document.getElementById('pGenBtn').addEventListener('click',pGen);
 document.getElementById('pShBtn').addEventListener('click',pShare);
 document.getElementById('pMailBtn').addEventListener('click',pMailJorge);
+document.getElementById('pXlsBtn').addEventListener('click',pDescargarExcel);
 document.getElementById('pNwBtn').addEventListener('click',pNew);
 document.getElementById('pd').addEventListener('input',pRD);
 
@@ -622,6 +624,47 @@ function pShare(){
   var waUrl = 'https://wa.me/?text=' + encodeURIComponent(pMsg);
   if(navigator.share) navigator.share({text:pMsg}).catch(function(){ window.open(waUrl,'_blank'); });
   else window.open(waUrl,'_blank');
+}
+
+function pDescargarExcel(){
+  if(!pMsg) return;
+  // Armar datos del pedido
+  var rows = [['Código','Descripción','Bultos','Unidades','Sin Descuento']];
+  document.querySelectorAll('#prb tr').forEach(function(tr){
+    var tds = tr.querySelectorAll('td');
+    if(tds.length >= 4){
+      var cod = tds[0].textContent.trim();
+      var nom = tds[1].textContent.trim();
+      var bul = tds[2].textContent.trim();
+      var uni = tds[3].textContent.trim();
+      rows.push([cod, nom, bul, uni]);
+    }
+  });
+
+  var vendedor = (document.getElementById('pv')||{}).value||'';
+  var cliente = (document.getElementById('pc')||{}).value||'';
+  var desc = (document.getElementById('pd')||{}).value||'0';
+  var obs = (document.getElementById('po')||{}).value||'';
+  var fecha = new Date().toLocaleDateString('es-AR');
+
+  // Hoja info
+  var info = [
+    ['PEDIDO MELECH'],
+    ['Fecha', fecha],
+    ['Vendedor', vendedor],
+    ['Cliente', cliente],
+    ['Descuento', desc + '%'],
+    ['Observaciones', obs],
+    [],
+  ];
+
+  var wb = XLSX.utils.book_new();
+  var ws_info = XLSX.utils.aoa_to_sheet(info.concat(rows));
+  ws_info['!cols'] = [{wch:20},{wch:45},{wch:10},{wch:12},{wch:14}];
+  XLSX.utils.book_append_sheet(wb, ws_info, 'Pedido');
+
+  var nombre = 'Pedido_' + (cliente||'cliente').replace(/\s+/g,'_') + '_' + fecha.replace(/\//g,'-') + '.xlsx';
+  XLSX.writeFile(wb, nombre);
 }
 
 function pMailJorge(){
