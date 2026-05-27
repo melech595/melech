@@ -670,7 +670,8 @@ function pDescargarExcel(){
 function pMailJorge(){
   var asunto = encodeURIComponent('Pedido Melech — ' + (document.getElementById('pc').value||'Cliente'));
   var cuerpo = encodeURIComponent(pMsg);
-  var mailUrl = 'mailto:jorgegamaleds@gmail.com?subject=' + asunto + '&body=' + cuerpo;
+  var destinatarios = 'jorgegamaleds@gmail.com,hazlaja.ventas@gmail.com,axelmasri@gmail.com';
+  var mailUrl = 'mailto:' + destinatarios + '?subject=' + asunto + '&body=' + cuerpo;
   window.open(mailUrl, '_blank');
 }
 
